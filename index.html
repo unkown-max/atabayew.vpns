@@ -1,0 +1,850 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN Pro | Premium Config Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        dark: {
+                            900: '#0a0a0f',
+                            800: '#12121a',
+                            700: '#1a1a2e',
+                            600: '#252542',
+                            500: '#32325a',
+                        },
+                        accent: {
+                            cyan: '#00d4ff',
+                            purple: '#8b5cf6',
+                            green: '#10b981',
+                            red: '#ef4444',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #0a0a0f; }
+        .glass {
+            background: rgba(26, 26, 46, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .glow-cyan { box-shadow: 0 0 30px rgba(0,212,255,0.15); }
+        .glow-purple { box-shadow: 0 0 30px rgba(139,92,246,0.15); }
+        .gradient-text {
+            background: linear-gradient(135deg, #00d4ff, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .node-card {
+            transition: all 0.3s ease;
+        }
+        .node-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0,212,255,0.3);
+        }
+        .node-card.active {
+            border-color: #00d4ff;
+            background: rgba(0,212,255,0.05);
+        }
+        .config-box {
+            background: #0d0d1a;
+            border: 1px solid rgba(0,212,255,0.2);
+        }
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .status-online { background: #10b981; }
+        .status-offline { background: #ef4444; }
+        .status-maintenance { background: #f59e0b; }
+        .copy-btn:active { transform: scale(0.95); }
+        .tab-active {
+            border-bottom: 2px solid #00d4ff;
+            color: #00d4ff;
+        }
+        .qr-container {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0f; }
+        ::-webkit-scrollbar-thumb { background: #32325a; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00d4ff; }
+    </style>
+</head>
+<body class="text-gray-300 font-sans min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 glass border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-cyan to-accent-purple flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                </div>
+                <span class="text-xl font-bold text-white tracking-tight">VPN<span class="text-accent-cyan">Pro</span></span>
+            </div>
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+                <a href="#nodes" class="hover:text-accent-cyan transition-colors">Node'lar</a>
+                <a href="#generator" class="hover:text-accent-cyan transition-colors">Config Olustur</a>
+                <a href="#plans" class="hover:text-accent-cyan transition-colors">Planlar</a>
+                <a href="#dashboard" class="hover:text-accent-cyan transition-colors">Panel</a>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex items-center gap-2 text-xs text-gray-500 bg-dark-700 px-3 py-1.5 rounded-full">
+                    <span class="w-2 h-2 rounded-full status-online pulse-dot"></span>
+                    Sistem Aktif
+                </div>
+                <button class="bg-accent-cyan text-dark-900 px-5 py-2 rounded-lg font-semibold text-sm hover:bg-cyan-300 transition-colors">
+                    Giris Yap
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute top-20 left-1/4 w-96 h-96 bg-accent-cyan/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-20 right-1/4 w-96 h-96 bg-accent-purple/10 rounded-full blur-3xl"></div>
+        </div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center max-w-3xl mx-auto">
+                <div class="inline-flex items-center gap-2 bg-dark-700 border border-white/10 rounded-full px-4 py-1.5 text-sm mb-6">
+                    <span class="w-2 h-2 rounded-full bg-accent-green animate-pulse"></span>
+                    8 Ulkede 12 Node Aktif
+                </div>
+                <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                    Kendi <span class="gradient-text">VPN Config'ini</span><br>Olustur
+                </h1>
+                <p class="text-lg text-gray-400 mb-10 max-w-xl mx-auto">
+                    WireGuard ve OpenVPN protokolleri ile kendi ozel VPN konfigurasyonlar?n?z? saniyeler icinde olusturun. 
+                    Global node'lar, dusuk gecikme, askeri seviye sifreleme.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="scrollToSection('generator')" class="bg-gradient-to-r from-accent-cyan to-accent-purple text-white px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity glow-cyan">
+                        Config Olustur
+                    </button>
+                    <button onclick="scrollToSection('nodes')" class="glass text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/5 transition-colors border border-white/10">
+                        Node'lar? Incele
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="py-8 border-y border-white/5 bg-dark-800/50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="text-3xl font-bold text-white mb-1" id="stat-users">2,847</div>
+                    <div class="text-sm text-gray-500">Aktif Kullan?c?</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-white mb-1">99.9%</div>
+                    <div class="text-sm text-gray-500">Uptime</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-white mb-1">~13ms</div>
+                    <div class="text-sm text-gray-500">Ort. Gecikme</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold text-white mb-1">8</div>
+                    <div class="text-sm text-gray-500">Global Lokasyon</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nodes Section -->
+    <section id="nodes" class="py-20 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Global Node'lar</h2>
+                    <p class="text-gray-400">Dunya cap?nda optimize edilmis sunucular</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="filterNodes('all')" class="node-filter px-4 py-2 rounded-lg text-sm bg-dark-700 text-white hover:bg-dark-600 transition-colors active" data-filter="all">Tumu</button>
+                    <button onclick="filterNodes('europe')" class="node-filter px-4 py-2 rounded-lg text-sm bg-dark-700 text-gray-400 hover:bg-dark-600 transition-colors" data-filter="europe">Avrupa</button>
+                    <button onclick="filterNodes('america')" class="node-filter px-4 py-2 rounded-lg text-sm bg-dark-700 text-gray-400 hover:bg-dark-600 transition-colors" data-filter="america">Amerika</button>
+                    <button onclick="filterNodes('asia')" class="node-filter px-4 py-2 rounded-lg text-sm bg-dark-700 text-gray-400 hover:bg-dark-600 transition-colors" data-filter="asia">Asya</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="nodes-grid">
+                <!-- Node Cards populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Config Generator Section -->
+    <section id="generator" class="py-20 px-6 bg-dark-800/30">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Config Olusturucu</h2>
+                <p class="text-gray-400">Protokol sec, node belirle, config'i indir</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Panel: Settings -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Protocol Selection -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-white font-semibold mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-accent-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            Protokol
+                        </h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center gap-3 p-3 rounded-xl border border-accent-cyan/30 bg-accent-cyan/5 cursor-pointer transition-all hover:border-accent-cyan/60" id="proto-wg-label">
+                                <input type="radio" name="protocol" value="wireguard" checked class="w-4 h-4 accent-accent-cyan" onchange="selectProtocol('wireguard')">
+                                <div class="flex-1">
+                                    <div class="text-white font-medium text-sm">WireGuard</div>
+                                    <div class="text-gray-500 text-xs">H?zl? & Modern</div>
+                                </div>
+                                <span class="text-accent-cyan text-xs font-mono">UDP</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 rounded-xl border border-white/10 cursor-pointer transition-all hover:border-white/20" id="proto-ov-label">
+                                <input type="radio" name="protocol" value="openvpn" class="w-4 h-4 accent-accent-cyan" onchange="selectProtocol('openvpn')">
+                                <div class="flex-1">
+                                    <div class="text-white font-medium text-sm">OpenVPN</div>
+                                    <div class="text-gray-500 text-xs">Guvenilir & Esnek</div>
+                                </div>
+                                <span class="text-gray-500 text-xs font-mono">TCP/UDP</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Node Selection -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-white font-semibold mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/></svg>
+                            Node Secimi
+                        </h3>
+                        <div class="space-y-2 max-h-64 overflow-y-auto pr-2" id="node-selector">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Config Name -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-white font-semibold mb-4">Config Ad?</h3>
+                        <input type="text" id="config-name" placeholder="ornegin: telefon-wg" 
+                            class="w-full bg-dark-900 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-accent-cyan transition-colors font-mono"
+                            oninput="updatePreview()">
+                    </div>
+                </div>
+
+                <!-- Center/Right: Preview & Output -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Live Preview -->
+                    <div class="glass rounded-2xl p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-white font-semibold">Onizleme</h3>
+                            <div class="flex gap-2">
+                                <span class="text-xs px-2 py-1 rounded bg-accent-cyan/10 text-accent-cyan font-mono" id="preview-protocol">WireGuard</span>
+                                <span class="text-xs px-2 py-1 rounded bg-accent-purple/10 text-accent-purple font-mono" id="preview-node">Frankfurt</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-dark-900 rounded-xl p-4 text-center">
+                                <div class="text-gray-500 text-xs mb-1">Gecikme</div>
+                                <div class="text-accent-cyan font-mono font-bold" id="preview-latency">12ms</div>
+                            </div>
+                            <div class="bg-dark-900 rounded-xl p-4 text-center">
+                                <div class="text-gray-500 text-xs mb-1">H?z</div>
+                                <div class="text-accent-green font-mono font-bold" id="preview-speed">1Gbps</div>
+                            </div>
+                            <div class="bg-dark-900 rounded-xl p-4 text-center">
+                                <div class="text-gray-500 text-xs mb-1">Sifreleme</div>
+                                <div class="text-white font-mono font-bold text-sm" id="preview-encryption">ChaCha20</div>
+                            </div>
+                            <div class="bg-dark-900 rounded-xl p-4 text-center">
+                                <div class="text-gray-500 text-xs mb-1">Durum</div>
+                                <div class="text-accent-green font-mono font-bold flex items-center justify-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-accent-green"></span> Aktif
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="generateConfig()" class="w-full bg-gradient-to-r from-accent-cyan to-accent-purple text-white py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                            Config Olustur
+                        </button>
+                    </div>
+
+                    <!-- Generated Config Output -->
+                    <div id="config-output" class="hidden slide-in">
+                        <div class="glass rounded-2xl p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-white font-semibold flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Config Olusturuldu
+                                </h3>
+                                <div class="flex gap-2">
+                                    <button onclick="copyConfig()" class="copy-btn flex items-center gap-2 px-4 py-2 rounded-lg bg-dark-700 text-sm hover:bg-dark-600 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                        Kopyala
+                                    </button>
+                                    <button onclick="downloadConfig()" class="copy-btn flex items-center gap-2 px-4 py-2 rounded-lg bg-accent-cyan text-dark-900 text-sm font-medium hover:bg-cyan-300 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                        Indir
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Tabs -->
+                            <div class="flex gap-6 border-b border-white/10 mb-4">
+                                <button onclick="switchTab('text')" class="tab-btn pb-3 text-sm font-medium tab-active" data-tab="text">Metin</button>
+                                <button onclick="switchTab('qr')" class="tab-btn pb-3 text-sm font-medium text-gray-500 hover:text-white transition-colors" data-tab="qr">QR Kod</button>
+                            </div>
+
+                            <!-- Text Config -->
+                            <div id="tab-text" class="config-box rounded-xl p-4 overflow-x-auto">
+                                <pre class="text-xs font-mono text-gray-300 leading-relaxed" id="config-text"></pre>
+                            </div>
+
+                            <!-- QR Code -->
+                            <div id="tab-qr" class="hidden flex justify-center py-8">
+                                <div class="qr-container">
+                                    <canvas id="qr-canvas" width="200" height="200"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Connection Info -->
+                            <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div class="bg-dark-900 rounded-lg p-3">
+                                    <div class="text-gray-500 text-xs">Endpoint</div>
+                                    <div class="text-white font-mono text-xs truncate" id="info-endpoint">-</div>
+                                </div>
+                                <div class="bg-dark-900 rounded-lg p-3">
+                                    <div class="text-gray-500 text-xs">Port</div>
+                                    <div class="text-white font-mono text-xs" id="info-port">-</div>
+                                </div>
+                                <div class="bg-dark-900 rounded-lg p-3">
+                                    <div class="text-gray-500 text-xs">DNS</div>
+                                    <div class="text-white font-mono text-xs">1.1.1.1, 8.8.8.8</div>
+                                </div>
+                                <div class="bg-dark-900 rounded-lg p-3">
+                                    <div class="text-gray-500 text-xs">MTU</div>
+                                    <div class="text-white font-mono text-xs">1420</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plans Section -->
+    <section id="plans" class="py-20 px-6">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Reseller Planlar?</h2>
+                <p class="text-gray-400">Kendi VPN isletmenizi kurun</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Starter -->
+                <div class="glass rounded-2xl p-8 border border-white/5 hover:border-accent-cyan/30 transition-all">
+                    <div class="text-gray-400 text-sm font-medium mb-2">Starter</div>
+                    <div class="text-4xl font-bold text-white mb-1">350 <span class="text-lg text-gray-500">TMT</span></div>
+                    <div class="text-gray-500 text-sm mb-6">ayl?k</div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            10 Musteri Slotu
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Tum 8 Global Node
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            S?n?rs?z Config
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            7/24 Destek
+                        </li>
+                    </ul>
+                    <button class="w-full py-3 rounded-xl border border-white/20 text-white font-medium hover:bg-white/5 transition-colors">
+                        Plan Sec
+                    </button>
+                </div>
+
+                <!-- Growth (Popular) -->
+                <div class="glass rounded-2xl p-8 border-2 border-accent-cyan/50 relative glow-cyan">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-accent-cyan to-accent-purple text-white text-xs font-bold px-4 py-1 rounded-full">
+                        EN POPULER
+                    </div>
+                    <div class="text-accent-cyan text-sm font-medium mb-2">Growth</div>
+                    <div class="text-4xl font-bold text-white mb-1">1,050 <span class="text-lg text-gray-500">TMT</span></div>
+                    <div class="text-gray-500 text-sm mb-6">ayl?k</div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            30 Musteri Slotu
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Tum 8 Global Node
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            S?n?rs?z Config
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Oncelikli Destek
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Panel Erisimi
+                        </li>
+                    </ul>
+                    <button class="w-full py-3 rounded-xl bg-gradient-to-r from-accent-cyan to-accent-purple text-white font-medium hover:opacity-90 transition-opacity">
+                        Plan Sec
+                    </button>
+                </div>
+
+                <!-- Pro -->
+                <div class="glass rounded-2xl p-8 border border-white/5 hover:border-accent-purple/30 transition-all glow-purple">
+                    <div class="text-accent-purple text-sm font-medium mb-2">Pro</div>
+                    <div class="text-4xl font-bold text-white mb-1">1,750 <span class="text-lg text-gray-500">TMT</span></div>
+                    <div class="text-gray-500 text-sm mb-6">ayl?k</div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            50 Musteri Slotu
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            Tum 8 Global Node
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            S?n?rs?z Config
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            VIP Destek
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <svg class="w-5 h-5 text-accent-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            API Erisimi
+                        </li>
+                    </ul>
+                    <button class="w-full py-3 rounded-xl border border-accent-purple/50 text-white font-medium hover:bg-accent-purple/10 transition-colors">
+                        Plan Sec
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Preview -->
+    <section id="dashboard" class="py-20 px-6 bg-dark-800/30">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Reseller Paneli</h2>
+                <p class="text-gray-400">Musterilerinizi ve config'lerinizi tek yerden yonetin</p>
+            </div>
+
+            <div class="glass rounded-2xl p-6 overflow-hidden">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                    <div class="flex gap-4">
+                        <div class="text-center px-4 py-2 bg-dark-900 rounded-lg">
+                            <div class="text-2xl font-bold text-white">24</div>
+                            <div class="text-xs text-gray-500">Aktif Kullan?c?</div>
+                        </div>
+                        <div class="text-center px-4 py-2 bg-dark-900 rounded-lg">
+                            <div class="text-2xl font-bold text-accent-cyan">156</div>
+                            <div class="text-xs text-gray-500">Toplam Config</div>
+                        </div>
+                        <div class="text-center px-4 py-2 bg-dark-900 rounded-lg">
+                            <div class="text-2xl font-bold text-accent-green">99.8%</div>
+                            <div class="text-xs text-gray-500">Uptime</div>
+                        </div>
+                    </div>
+                    <button class="bg-accent-cyan text-dark-900 px-6 py-2 rounded-lg font-medium text-sm hover:bg-cyan-300 transition-colors">
+                        + Yeni Config
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-gray-500 border-b border-white/10">
+                                <th class="text-left py-3 px-4 font-medium">Kullan?c?</th>
+                                <th class="text-left py-3 px-4 font-medium">Node</th>
+                                <th class="text-left py-3 px-4 font-medium">Protokol</th>
+                                <th class="text-left py-3 px-4 font-medium">Olusturma</th>
+                                <th class="text-left py-3 px-4 font-medium">Durum</th>
+                                <th class="text-right py-3 px-4 font-medium">Islem</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-300">
+                            <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                <td class="py-3 px-4 font-mono text-xs">user_7a3f9</td>
+                                <td class="py-3 px-4 flex items-center gap-2">
+                                    <span class="text-lg">????</span> Frankfurt
+                                </td>
+                                <td class="py-3 px-4"><span class="px-2 py-1 rounded bg-accent-cyan/10 text-accent-cyan text-xs">WireGuard</span></td>
+                                <td class="py-3 px-4 text-gray-500">2 saat once</td>
+                                <td class="py-3 px-4"><span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-accent-green"></span> Aktif</span></td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-gray-500 hover:text-accent-cyan transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                <td class="py-3 px-4 font-mono text-xs">user_9b2e1</td>
+                                <td class="py-3 px-4 flex items-center gap-2">
+                                    <span class="text-lg">????</span> London
+                                </td>
+                                <td class="py-3 px-4"><span class="px-2 py-1 rounded bg-accent-purple/10 text-accent-purple text-xs">OpenVPN</span></td>
+                                <td class="py-3 px-4 text-gray-500">5 saat once</td>
+                                <td class="py-3 px-4"><span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-accent-green"></span> Aktif</span></td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-gray-500 hover:text-accent-cyan transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                <td class="py-3 px-4 font-mono text-xs">user_4c8d2</td>
+                                <td class="py-3 px-4 flex items-center gap-2">
+                                    <span class="text-lg">????</span> New York
+                                </td>
+                                <td class="py-3 px-4"><span class="px-2 py-1 rounded bg-accent-cyan/10 text-accent-cyan text-xs">WireGuard</span></td>
+                                <td class="py-3 px-4 text-gray-500">1 gun once</td>
+                                <td class="py-3 px-4"><span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> S?n?rda</span></td>
+                                <td class="py-3 px-4 text-right">
+                                    <button class="text-gray-500 hover:text-accent-cyan transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-white/5">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-accent-purple flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                </div>
+                <span class="text-lg font-bold text-white">VPN<span class="text-accent-cyan">Pro</span></span>
+            </div>
+            <div class="flex gap-8 text-sm text-gray-500">
+                <a href="#" class="hover:text-white transition-colors">Gizlilik</a>
+                <a href="#" class="hover:text-white transition-colors">Kullan?m Sartlar?</a>
+                <a href="#" class="hover:text-white transition-colors">Destek</a>
+            </div>
+            <div class="text-sm text-gray-600">
+                © 2024 VPNPro. Tum haklar? sakl?d?r.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Node Data
+        const nodes = [
+            { id: 'de', country: 'Germany', city: 'Frankfurt', flag: '????', region: 'europe', latency: 12, speed: '1Gbps', status: 'online', load: 45 },
+            { id: 'uk', country: 'United Kingdom', city: 'London', flag: '????', region: 'europe', latency: 18, speed: '1Gbps', status: 'online', load: 62 },
+            { id: 'nl', country: 'Netherlands', city: 'Amsterdam', flag: '????', region: 'europe', latency: 15, speed: '1Gbps', status: 'online', load: 38 },
+            { id: 'fi', country: 'Finland', city: 'Helsinki', flag: '????', region: 'europe', latency: 22, speed: '1Gbps', status: 'online', load: 28 },
+            { id: 'tr', country: 'Turkey', city: 'Istanbul', flag: '????', region: 'europe', latency: 8, speed: '1Gbps', status: 'online', load: 55 },
+            { id: 'us', country: 'United States', city: 'New York', flag: '????', region: 'america', latency: 85, speed: '1Gbps', status: 'online', load: 72 },
+            { id: 'se', country: 'Sweden', city: 'Stockholm', flag: '????', region: 'europe', latency: 20, speed: '1Gbps', status: 'maintenance', load: 0 },
+            { id: 'jp', country: 'Japan', city: 'Tokyo', flag: '????', region: 'asia', latency: 120, speed: '1Gbps', status: 'online', load: 41 },
+        ];
+
+        let selectedNode = nodes[0];
+        let selectedProtocol = 'wireguard';
+        let generatedConfig = '';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNodes('all');
+            renderNodeSelector();
+            updatePreview();
+            animateStats();
+        });
+
+        // Render Node Cards
+        function renderNodes(filter) {
+            const grid = document.getElementById('nodes-grid');
+            const filtered = filter === 'all' ? nodes : nodes.filter(n => n.region === filter);
+            
+            grid.innerHTML = filtered.map(node => `
+                <div class="node-card glass rounded-2xl p-5 border border-white/5 cursor-pointer ${node.id === selectedNode.id ? 'active' : ''}" 
+                     onclick="selectNode('${node.id}')" data-node="${node.id}">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="text-3xl">${node.flag}</div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full ${node.status === 'online' ? 'status-online' : node.status === 'maintenance' ? 'status-maintenance' : 'status-offline'}"></span>
+                            <span class="text-xs text-gray-500">${node.status === 'online' ? 'Aktif' : 'Bak?m'}</span>
+                        </div>
+                    </div>
+                    <h3 class="text-white font-semibold mb-1">${node.city}</h3>
+                    <p class="text-gray-500 text-sm mb-4">${node.country}</p>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-400">${node.latency}ms</span>
+                        <span class="text-gray-400">${node.speed}</span>
+                    </div>
+                    <div class="mt-3 w-full bg-dark-900 rounded-full h-1.5 overflow-hidden">
+                        <div class="h-full rounded-full ${node.load > 70 ? 'bg-accent-red' : node.load > 50 ? 'bg-yellow-500' : 'bg-accent-green'}" style="width: ${node.load}%"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Node Selector for Generator
+        function renderNodeSelector() {
+            const selector = document.getElementById('node-selector');
+            selector.innerHTML = nodes.filter(n => n.status === 'online').map(node => `
+                <label class="flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${node.id === selectedNode.id ? 'border-accent-cyan/50 bg-accent-cyan/5' : 'border-white/10 hover:border-white/20'}" 
+                       onclick="selectNode('${node.id}')" id="selector-${node.id}">
+                    <input type="radio" name="gen-node" value="${node.id}" ${node.id === selectedNode.id ? 'checked' : ''} class="w-4 h-4 accent-accent-cyan">
+                    <div class="flex-1">
+                        <div class="text-white text-sm font-medium">${node.flag} ${node.city}</div>
+                        <div class="text-gray-500 text-xs">${node.country} • ${node.latency}ms</div>
+                    </div>
+                    <div class="w-2 h-2 rounded-full ${node.load > 70 ? 'bg-accent-red' : node.load > 50 ? 'bg-yellow-500' : 'bg-accent-green'}"></div>
+                </label>
+            `).join('');
+        }
+
+        // Select Node
+        function selectNode(nodeId) {
+            selectedNode = nodes.find(n => n.id === nodeId);
+            
+            document.querySelectorAll('.node-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.node === nodeId);
+            });
+            
+            document.querySelectorAll('#node-selector label').forEach(label => {
+                const isSelected = label.id === `selector-${nodeId}`;
+                label.className = `flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${isSelected ? 'border-accent-cyan/50 bg-accent-cyan/5' : 'border-white/10 hover:border-white/20'}`;
+                label.querySelector('input').checked = isSelected;
+            });
+            
+            updatePreview();
+        }
+
+        // Filter Nodes
+        function filterNodes(region) {
+            document.querySelectorAll('.node-filter').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === region);
+                btn.classList.toggle('text-white', btn.dataset.filter === region);
+                btn.classList.toggle('text-gray-400', btn.dataset.filter !== region);
+            });
+            renderNodes(region);
+        }
+
+        // Select Protocol
+        function selectProtocol(protocol) {
+            selectedProtocol = protocol;
+            document.getElementById('proto-wg-label').className = protocol === 'wireguard' 
+                ? 'flex items-center gap-3 p-3 rounded-xl border border-accent-cyan/30 bg-accent-cyan/5 cursor-pointer transition-all hover:border-accent-cyan/60'
+                : 'flex items-center gap-3 p-3 rounded-xl border border-white/10 cursor-pointer transition-all hover:border-white/20';
+            document.getElementById('proto-ov-label').className = protocol === 'openvpn'
+                ? 'flex items-center gap-3 p-3 rounded-xl border border-accent-cyan/30 bg-accent-cyan/5 cursor-pointer transition-all hover:border-accent-cyan/60'
+                : 'flex items-center gap-3 p-3 rounded-xl border border-white/10 cursor-pointer transition-all hover:border-white/20';
+            updatePreview();
+        }
+
+        // Update Preview
+        function updatePreview() {
+            document.getElementById('preview-protocol').textContent = selectedProtocol === 'wireguard' ? 'WireGuard' : 'OpenVPN';
+            document.getElementById('preview-node').textContent = selectedNode.city;
+            document.getElementById('preview-latency').textContent = selectedNode.latency + 'ms';
+            document.getElementById('preview-encryption').textContent = selectedProtocol === 'wireguard' ? 'ChaCha20' : 'AES-256-GCM';
+        }
+
+        // Generate Config
+        function generateConfig() {
+            const configName = document.getElementById('config-name').value || 'vpn-config';
+            const privateKey = generateKey();
+            const publicKey = generateKey();
+            const presharedKey = generateKey();
+            const address = `10.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}.${Math.floor(Math.random()*256)}/32`;
+            
+            if (selectedProtocol === 'wireguard') {
+                generatedConfig = `[Interface]
+PrivateKey = ${privateKey}
+Address = ${address}
+DNS = 1.1.1.1, 8.8.8.8
+MTU = 1420
+
+[Peer]
+PublicKey = ${publicKey}
+PresharedKey = ${presharedKey}
+AllowedIPs = 0.0.0.0/0, ::/0
+Endpoint = ${selectedNode.city.toLowerCase().replace(' ', '')}.vpnpro.net:51820
+PersistentKeepalive = 25`;
+            } else {
+                generatedConfig = `client
+dev tun
+proto udp
+remote ${selectedNode.city.toLowerCase().replace(' ', '')}.vpnpro.net 1194
+resolv-retry infinite
+nobind
+persist-key
+persist-tun
+ca ca.crt
+cert client.crt
+key client.key
+remote-cert-tls server
+cipher AES-256-GCM
+auth SHA256
+verb 3
+
+<ca>
+-----BEGIN CERTIFICATE-----
+${generateKey().repeat(4)}
+-----END CERTIFICATE-----
+</ca>`;
+            }
+
+            document.getElementById('config-text').textContent = generatedConfig;
+            document.getElementById('info-endpoint').textContent = `${selectedNode.city.toLowerCase().replace(' ', '')}.vpnpro.net`;
+            document.getElementById('info-port').textContent = selectedProtocol === 'wireguard' ? '51820' : '1194';
+            
+            document.getElementById('config-output').classList.remove('hidden');
+            
+            generateQR(generatedConfig);
+            
+            document.getElementById('config-output').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Generate Random Key
+        function generateKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+            let key = '';
+            for (let i = 0; i < 44; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return key + '=';
+        }
+
+        // Generate QR Code
+        function generateQR(text) {
+            const canvas = document.getElementById('qr-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, 200, 200);
+            ctx.fillStyle = '#0a0a0f';
+            
+            const cellSize = 5;
+            const gridSize = 40;
+            
+            let seed = 0;
+            for (let i = 0; i < text.length; i++) seed += text.charCodeAt(i);
+            
+            for (let x = 0; x < gridSize; x++) {
+                for (let y = 0; y < gridSize; y++) {
+                    const pseudoRandom = Math.sin(seed * x * y * 0.1) * 10000;
+                    if ((pseudoRandom - Math.floor(pseudoRandom)) > 0.5) {
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+            
+            ctx.fillStyle = '#0a0a0f';
+            ctx.fillRect(0, 0, 35, 35);
+            ctx.clearRect(5, 5, 25, 25);
+            ctx.fillRect(10, 10, 15, 15);
+            
+            ctx.fillRect(165, 0, 35, 35);
+            ctx.clearRect(170, 5, 25, 25);
+            ctx.fillRect(175, 10, 15, 15);
+            
+            ctx.fillRect(0, 165, 35, 35);
+            ctx.clearRect(5, 170, 25, 25);
+            ctx.fillRect(10, 175, 15, 15);
+        }
+
+        // Switch Tab
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('tab-active', btn.dataset.tab === tab);
+                btn.classList.toggle('text-gray-500', btn.dataset.tab !== tab);
+            });
+            document.getElementById('tab-text').classList.toggle('hidden', tab !== 'text');
+            document.getElementById('tab-qr').classList.toggle('hidden', tab !== 'qr');
+        }
+
+        // Copy Config
+        function copyConfig() {
+            navigator.clipboard.writeText(generatedConfig).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const original = btn.innerHTML;
+                btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Kopyaland?';
+                setTimeout(() => btn.innerHTML = original, 2000);
+            });
+        }
+
+        // Download Config
+        function downloadConfig() {
+            const configName = document.getElementById('config-name').value || 'vpn-config';
+            const extension = selectedProtocol === 'wireguard' ? 'conf' : 'ovpn';
+            const blob = new Blob([generatedConfig], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${configName}.${extension}`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Scroll to Section
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Animate Stats
+        function animateStats() {
+            const stat = document.getElementById('stat-users');
+            let count = 0;
+            const target = 2847;
+            const increment = target / 50;
+            const timer = setInterval(() => {
+                count += increment;
+                if (count >= target) {
+                    count = target;
+                    clearInterval(timer);
+                }
+                stat.textContent = Math.floor(count).toLocaleString();
+            }, 30);
+        }
+    </script>
+</body>
+</html>
